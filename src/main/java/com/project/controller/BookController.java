@@ -1,0 +1,47 @@
+package com.project.controller;
+
+import com.project.model.Book;
+import com.project.repository.BookRepository;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
+import java.util.Optional;
+
+@RestController
+@RequestMapping("/api/books")
+public class BookController {
+
+    @Autowired
+    private BookRepository bookRepository;
+
+    @GetMapping
+    public List<Book> getAllBooks() {
+        return bookRepository.findAll();
+    }
+
+    @GetMapping("/{id}")
+    public Optional<Book> getBookById(@PathVariable Long id) {
+        return bookRepository.findById(id);
+    }
+
+    @PostMapping
+    public Book createBook(@RequestBody Book book) {
+        return bookRepository.save(book);
+    }
+
+    @PutMapping("/{id}")
+    public Book updateBook(@PathVariable Long id, @RequestBody Book bookDetails) {
+        Book book = bookRepository.findById(id).orElseThrow(() -> new RuntimeException("Book not found"));
+        book.setTitle(bookDetails.getTitle());
+        book.setAuthor(bookDetails.getAuthor());
+        book.setPublicationYear(bookDetails.getPublicationYear());
+        book.setAvailable(bookDetails.isAvailable());
+        return bookRepository.save(book);
+    }
+
+    @DeleteMapping("/{id}")
+    public void deleteBook(@PathVariable Long id) {
+        bookRepository.deleteById(id);
+    }
+}
